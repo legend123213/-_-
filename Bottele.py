@@ -9,6 +9,13 @@ from experiance import conversation_experiance
 from project import conversation_project
 from personal_information_ import conversation_personalinfo
 from skill import conversation_skill
+import os
+from dotenv import load_dotenv
+
+
+load_dotenv()
+TELEGRAM_API_TOKEN = os.getenv("TELEGRAM_API_TOKEN")
+DEBUG = os.getenv("DEBUG") == "True"
 STATE1,STATE2,STATE3,STATE4,STATE5 = range(5)
 data ={
    "username":"",
@@ -128,7 +135,7 @@ conversation_one = ConversationHandler(
    },fallbacks=[]
 ) 
 
-app = ApplicationBuilder().token("5950008594:AAGDEMLXawLSYUa2GrNgk6NxPXDU-nGDgjs").build()
+app = ApplicationBuilder().token(TELEGRAM_API_TOKEN).build()
 
 app.add_handler(conversation_one)
 app.add_handlers([CommandHandler("create_education",create_education)])
