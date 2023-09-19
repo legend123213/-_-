@@ -73,10 +73,11 @@ async def to_be_updated(update:Update,context:ContextTypes.DEFAULT_TYPE)->int:
     request = Request_to_Django(endpoint=f"http://localhost:8000/api/personal/skill/{data}",token=context.user_data["access_token"])
     response = request.get_request()
     data = response.json()
-    keyboard = [[InlineKeyboardButton(value,callback_data=key)] for key, value in data.items()]
+
+    keyboard = [[InlineKeyboardButton(data['Rate'],callback_data="Rate")]]
     mark_up = InlineKeyboardMarkup(keyboard)
     context.user_data["updated_skill"] = data
-    await context.bot.send_message(chat_id=context._user_id,text="here we go",reply_markup=mark_up)
+    await context.bot.send_message(chat_id=context._user_id,text="Edit your skill level ",reply_markup=mark_up)
     return STATE5
     
 async def handling_edited_button(update:Update,context:ContextTypes.DEFAULT_TYPE):

@@ -117,7 +117,12 @@ async def save_data(update:Update,context:ContextTypes.DEFAULT_TYPE):
     ]
     mark_up = InlineKeyboardMarkup(keyboard)
     await context.bot.send_message(chat_id=context._user_id,text=f"""
-her is you data {user_date}
+here is the data that update
+Name of the company : {user_date['NameOfCompany']}
+role you working on : {user_date['Role']}
+about the experiance : {user_date['DescribtionOfWork']}
+starting date : {user_date['DateFrom']}
+finished date : {user_date['DateTo']}
 """,reply_markup=mark_up)
     return STATE7
     
@@ -152,8 +157,8 @@ async def final_delete_handle(update:Update,context:ContextTypes.DEFAULT_TYPE):
         request= Request_to_Django(endpoint=endpoint,token=context.user_data["access_token"])
         response = request.delete_request()
         if response:
-            await context.bot.send_message(chat_id=context._user_id,text=response.json['message'])
-            return STATE8
+            await context.bot.send_message(chat_id=context._user_id,text="Done")
+            return STATE1
         else:
             await context.bot.send_message(chat_id=context._user_id,text="something wrong please try again!")
             return STATE1
@@ -203,12 +208,37 @@ Starting / Ending date with Company -------> {user_experiance["DateFrom"]}/{user
 
     
 
-              
+async def back_to(update:Update,context:ContextTypes.DEFAULT_TYPE):
+    user_id = update.message.from_user.id
+    current_state = context.user_data.get(user_id, {}).get('conversation_state')
+
+    if current_state is not None:
+        previous_state = None
+        if current_state == STATE2:
+            previous_state = STATE1
+        elif current_state == STATE3:
+            previous_state = STATE2
+
+        if previous_state is not None:
+            # Update the user's conversation state
+            context.user_data[user_id]['conversation_state'] = previous_state
+
+            # Handle state-specific actions for going back
+            if previous_state == STATE1:
+                update.message.reply_text("You are going back to State 1.")
+            elif previous_state == STATE2:
+                update.message.reply_text("You are going back to State 2.")
+
+            return previous_state
+
+    update.message.reply_text("You cannot go back from here.")
+    return current_state  # Return the current state if the user cannot go back
+             
     
     
 
 conversation_experiance = ConversationHandler(
-    entry_points=[CommandHandler("Experiance",start)],
+    entry_points=[CommandHandler("Experience",start)],
     states={
         STATE1:[CallbackQueryHandler(choose)],
         STATE2:[MessageHandler(filters.TEXT & ~filters.COMMAND,create)],
@@ -223,5 +253,5 @@ conversation_experiance = ConversationHandler(
         
 
     },
-    fallbacks=[]
+    fallbacks=[CommandHandler('back',back_to)]
 )

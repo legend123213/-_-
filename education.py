@@ -113,7 +113,12 @@ async def save_data(update:Update,context:ContextTypes.DEFAULT_TYPE):
     ]
     mark_up = InlineKeyboardMarkup(keyboard)
     await context.bot.send_message(chat_id=context._user_id,text=f"""
-her is you data {user_date}
+here is the data that update
+Name of the school : {user_date['NameOfSchool']}
+high achievement : {user_date['CertifiedWith']}
+about the experiance : {user_date['DescribtionOfWork']}
+starting date : {user_date['DateFrom']}
+finished date : {user_date['DateTo']}
 """,reply_markup=mark_up)
     return STATE7
     
@@ -125,7 +130,7 @@ async def save_handler(update:Update,context:ContextTypes.DEFAULT_TYPE):
     if data =="save":
         request = Request_to_Django(endpoint=f"http://localhost:8000/api/personal/education/{pk}",token=context.user_data["access_token"])
         response = request.put_request(data=data_of_user)
-        await context.bot.send_message(chat_id=context._user_id,text=f"updated here is your data{response.json()}")
+        await context.bot.send_message(chat_id=context._user_id,text=f"your data is updated")
         return STATE1
     else:
         await context.bot.send_message(chat_id=context._user_id,text=f"OKEY")
@@ -147,7 +152,7 @@ async def final_delete_handle(update:Update,context:ContextTypes.DEFAULT_TYPE):
         endpoint = f"http://localhost:8000/api/personal/education/{pk}" if pk !="all"  else f"http://localhost:8000/api/personal/educations/" 
         request= Request_to_Django(endpoint=endpoint,token=context.user_data["access_token"])
         response = request.delete_request()
-        if response:
+        if response.status_code == 200:
             await context.bot.send_message(chat_id=context._user_id,text=response.json['message'])
             return STATE8
         else:
